@@ -1,0 +1,195 @@
+.hero {
+  --coin: clamp(184px, 20.8vw, 300px);
+  --coin-y: 42%;
+  --side: clamp(20px, 10.4vw, 150px);
+  --name-size: clamp(76px, 16.8vw, 260px);
+  position: relative;
+  z-index: 3;
+  height: clamp(600px, 100svh, 1080px);
+  background: var(--c-night);
+  color: #fff;
+}
+
+.hero__orbits {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.hero__ring {
+  position: absolute;
+  left: 50%;
+  top: var(--coin-y);
+  width: var(--d);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  translate: -50% -50%;
+}
+.hero__ring--1 { --d: calc(var(--coin) * 2.02); }
+.hero__ring--2 { --d: calc(var(--coin) * 3.12); border-color: rgba(255, 255, 255, 0.11); }
+.hero__ring--3 { --d: calc(var(--coin) * 4.1); border-color: rgba(255, 255, 255, 0.09); }
+.hero__ring--4 { --d: calc(var(--coin) * 5.3); border-color: rgba(255, 255, 255, 0.06); }
+
+.hero__stage {
+  position: absolute;
+  inset: 0;
+}
+
+.hero__coin-anchor {
+  position: absolute;
+  z-index: 6;
+  width: var(--coin);
+  height: var(--coin);
+  left: calc(50% - var(--coin) / 2);
+  top: calc(var(--coin-y) - var(--coin) / 2);
+}
+
+/* orbiting metadata */
+.orbit-item {
+  position: absolute;
+  margin: 0;
+  z-index: 4;
+}
+.orbit-item__in {
+  display: inline-block;
+}
+.hero__meta {
+  font: 500 clamp(11px, 0.98vw, 14px) / 1.2 var(--f-sans);
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+}
+.hero__meta--role {
+  left: var(--side);
+  top: 20%;
+  font-style: italic;
+}
+.hero__meta--loc {
+  right: var(--side);
+  top: 20%;
+}
+.hero__meta--time {
+  left: var(--side);
+  top: 62%;
+  font-weight: 400;
+}
+
+/* dimensional role badge */
+.hero__badge {
+  left: calc(50% + var(--coin) / 2 + clamp(16px, 2.4vw, 36px));
+  top: calc(var(--coin-y) - 1.4em);
+  font-size: clamp(16px, 2vw, 30px);
+  perspective: 700px;
+}
+.badge3d {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  transform-style: preserve-3d;
+}
+.badge3d__icon {
+  width: 1.7em;
+  height: 1.7em;
+  transform: translateZ(26px);
+  filter: drop-shadow(0 6px 10px rgba(59, 139, 255, 0.35));
+}
+.badge3d__text {
+  position: relative;
+  font: italic 800 1em / 1 var(--f-sans);
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: #fff;
+  transform: translateZ(10px);
+  text-shadow:
+    0 1px 0 #c9c9d3,
+    0 2px 0 #9b9ba8,
+    0 3px 0 #6d6d7a,
+    0 4px 0 #44444f,
+    0 10px 22px rgba(0, 0, 0, 0.65);
+}
+.badge3d__text::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  background: var(--g-hello);
+  -webkit-background-clip: text;
+  background-clip: text;
+  opacity: 0.55;
+  transform: translate3d(5px, 6px, -22px);
+  filter: blur(6px);
+  text-shadow: none;
+  pointer-events: none;
+}
+
+/* title */
+.hero__title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 400;
+}
+.hero__hello {
+  font-size: clamp(36px, 4.9vw, 74px);
+  line-height: 1.25;
+  margin-bottom: calc(var(--name-size) * -0.08);
+  position: relative;
+  z-index: 2;
+}
+.hero__name-mask {
+  display: block;
+  width: 100%;
+  height: calc(var(--name-size) * 0.86);
+  overflow: hidden;
+  text-align: center;
+}
+.hero__name {
+  display: inline-block;
+  font-family: var(--f-brand);
+  font-size: var(--name-size);
+  line-height: 1.1;
+  letter-spacing: 0.035em;
+  color: #fff;
+}
+.hero__name .sc__mask {
+  padding-block: 0;
+  margin-block: 0;
+}
+
+@media (max-width: 1023.98px) {
+  .hero {
+    --coin-y: 40%;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .hero {
+    --coin: clamp(168px, 50vw, 220px);
+    --coin-y: 41%;
+    --side: 20px;
+    --name-size: clamp(64px, 21vw, 150px);
+    height: clamp(600px, 100svh, 900px);
+  }
+  .hero__meta--role,
+  .hero__meta--loc {
+    top: 15%;
+  }
+  .hero__meta--time {
+    top: calc(var(--coin-y) + var(--coin) / 2 + 22px);
+  }
+  .hero__badge {
+    left: auto;
+    right: var(--side);
+    top: calc(var(--coin-y) + var(--coin) / 2 + 12px);
+    font-size: 15px;
+  }
+  .hero__ring--1 { --d: calc(var(--coin) * 1.7); }
+  .hero__ring--2 { --d: calc(var(--coin) * 2.5); }
+  .hero__ring--3 { --d: calc(var(--coin) * 3.3); }
+  .hero__ring--4 { display: none; }
+}

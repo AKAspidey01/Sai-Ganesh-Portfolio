@@ -1,0 +1,174 @@
+.section--pinned {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: clamp(64px, 7vw, 100px);
+}
+
+.hpg {
+  width: 100%;
+  margin-top: clamp(32px, 3.6vw, 52px);
+  overflow: hidden;
+  outline: none;
+}
+.hpg__track {
+  display: flex;
+  gap: clamp(16px, 2.1vw, 30px);
+  width: max-content;
+  margin: 0;
+  padding: 0 max(var(--gutter-min), (100vw - var(--maxw)) / 2);
+  list-style: none;
+}
+.hpg__item {
+  flex: none;
+  display: flex;
+}
+/* reduced motion: a plain swipeable row */
+.hpg--native {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  padding-bottom: 12px;
+}
+.hpg--native .hpg__item {
+  scroll-snap-align: center;
+}
+
+/* ---------- project card ---------- */
+.project-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: clamp(264px, 25vw, 360px);
+  aspect-ratio: 360 / 474;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: linear-gradient(180deg, #232323 0%, #151515 48%, #0d0d0d 100%);
+  color: #fff;
+  text-decoration: none;
+  transition: border-color 0.35s var(--ease-out);
+}
+.project-card__tag {
+  position: absolute;
+  top: clamp(14px, 1.3vw, 20px);
+  left: clamp(14px, 1.3vw, 20px);
+  z-index: 2;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+  font: 500 clamp(11px, 0.9vw, 13px) / 1 var(--f-sans);
+}
+.project-card__media {
+  position: relative;
+  flex: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding-top: 18%;
+}
+.project-card__media::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 30%;
+  background: linear-gradient(180deg, transparent, #0f0f0f);
+  pointer-events: none;
+}
+.hpg__parallax {
+  display: block;
+  width: 112%;
+  transition: transform 0.6s var(--ease-out);
+}
+.hpg__parallax > img,
+.hpg__parallax > svg {
+  width: 100%;
+  height: auto;
+}
+.project-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: clamp(18px, 1.9vw, 28px) clamp(20px, 2.4vw, 36px) clamp(22px, 2.2vw, 32px);
+}
+.project-card__title {
+  font: 600 clamp(16px, 1.45vw, 21px) / 1.2 var(--f-sans);
+}
+.project-card__arrow {
+  flex: none;
+  width: clamp(22px, 1.8vw, 26px);
+  height: auto;
+  transition: transform 0.45s var(--ease-out);
+}
+@media (hover: hover) {
+  .project-card:hover {
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .project-card:hover .project-card__arrow {
+    transform: translate(3px, -3px) rotate(45deg);
+  }
+}
+
+/* ---------- review card ---------- */
+.review-card {
+  display: flex;
+  flex-direction: column;
+  width: clamp(272px, 25vw, 360px);
+  min-height: clamp(240px, 18.6vw, 270px);
+  height: 100%;
+  margin: 0;
+  padding: clamp(20px, 1.9vw, 26px) clamp(20px, 1.9vw, 26px) clamp(22px, 2vw, 28px);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--c-card);
+  color: #fff;
+}
+.review-card__who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.review-card__avatar {
+  flex: none;
+  width: clamp(40px, 3.4vw, 48px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+}
+.review-card__avatar--initials {
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #2c2b33, #47454f);
+  font: 700 14px / 1 var(--f-sans);
+  letter-spacing: 0.02em;
+}
+.review-card__name {
+  display: block;
+  font: 600 clamp(17px, 1.45vw, 21px) / 1.25 var(--f-sans);
+}
+.review-card__loc {
+  display: block;
+  margin-top: 2px;
+  font: 400 clamp(12px, 0.9vw, 13px) / 1.3 var(--f-sans);
+  color: #b9b9b9;
+}
+.review-card__stars {
+  display: flex;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: clamp(28px, 3.6vw, 52px);
+  color: #444;
+}
+.review-card__stars .is-on {
+  color: var(--c-star);
+}
+.review-card__quote {
+  margin: 14px 0 0;
+  font: 400 clamp(13px, 1.02vw, 15px) / 1.6 var(--f-body);
+  color: #e9e9e9;
+}

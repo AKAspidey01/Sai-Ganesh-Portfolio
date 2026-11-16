@@ -1,0 +1,39 @@
+:root {
+  /* colour — sampled from the Figma reference */
+  --c-night: #09080d;
+  --c-abyss: #040406;
+  --c-card: #191919;
+  --c-paper: #ffffff;
+  --c-ink: #232323;
+  --c-ink-soft: #4a4a4a;
+  --c-mute: #8a8a8a;
+  --c-line-dark: rgba(255, 255, 255, 0.14);
+  --c-line-light: rgba(17, 17, 17, 0.14);
+  --c-rose: #f0626a;
+  --c-mauve: #c97aa8;
+  --c-azure: #0f9aff;
+  --c-sky: #7dc8ff;
+  --c-star: #ffc34b;
+  --c-mist: #f7f8fc;
+  --c-track: #e7e7e7;
+
+  --g-script: linear-gradient(95deg, #c97aa8 0%, #e2708a 50%, #f0626a 100%);
+  --g-hello: linear-gradient(95deg, #3b7bff 0%, #8d8cf2 36%, #d9709d 64%, #f0626a 100%);
+  --g-contact: linear-gradient(90deg, #f0626a 0%, #b77ab8 45%, #2f8cff 100%);
+  --g-bar: linear-gradient(90deg, var(--c-sky), var(--c-azure));
+  --g-ring: linear-gradient(135deg, #f0626a 0%, #9a7be6 50%, #3b8bff 100%);
+  --g-logo: linear-gradient(95deg, #57a4ff 0%, #a387e8 45%, #f0626a 100%);
+
+  /* type */
+  --f-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-body: 'Manrope', var(--f-sans);
+  --f-brand: 'Anton', Impact, 'Arial Narrow Bold', sans-serif;
+  --f-script: 'Pacifico', 'Brush Script MT', cursive;
+  --f-kpi: 'Beatrice Headline Trial', 'Beatrice Headline', 'Plus Jakarta Sans', sans-serif;
+
+  /* layout */
+  --maxw: 1140px;
+  --gutter-min: clamp(20px, 5vw, 48px);
+  --section-pad: clamp(72px, 8.4vw, 124px);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}

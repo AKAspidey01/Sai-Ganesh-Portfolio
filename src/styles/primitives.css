@@ -1,0 +1,204 @@
+/* ---------- Pixel formation ---------- */
+.pf {
+  position: relative;
+  display: inline-block;
+  border-radius: var(--pf-radius, 0);
+}
+.pf__content {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  border-radius: inherit;
+}
+.pf__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  border-radius: var(--pf-radius, 0);
+  overflow: hidden;
+  pointer-events: none;
+}
+.pf__cell {
+  background: var(--pf-ink, #111);
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* ---------- Line reveal ---------- */
+.lr {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.lr__line {
+  flex: 1;
+  height: 1px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--lr-color, rgba(255, 255, 255, 0.6)), transparent);
+}
+.lr--start {
+  flex-direction: row-reverse;
+}
+.lr--end .lr__line {
+  transform-origin: right center;
+  background: linear-gradient(90deg, transparent, var(--lr-color, rgba(255, 255, 255, 0.6)));
+}
+.lr__dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--lr-dot, #fff);
+}
+
+/* ---------- Handwriting (Pacifico) ---------- */
+.hw {
+  --hw: 1;
+  display: inline-block;
+  padding: 0 0.14em 0.16em 0.06em;
+  margin: 0 -0.08em -0.16em -0.02em;
+  font-family: var(--f-script);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: transparent;
+  background: var(--g-script);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-mask-image: linear-gradient(100deg, #000 calc(var(--hw) * 135% - 35%), transparent calc(var(--hw) * 135%));
+  mask-image: linear-gradient(100deg, #000 calc(var(--hw) * 135% - 35%), transparent calc(var(--hw) * 135%));
+}
+.hw--hello {
+  background-image: var(--g-hello);
+}
+
+/* ---------- Split characters ---------- */
+.sc__chars {
+  display: inline-flex;
+  white-space: nowrap;
+}
+.sc__mask {
+  display: inline-block;
+  overflow: hidden;
+  /* room for ascenders/descenders inside the mask */
+  padding-block: 0.08em;
+  margin-block: -0.08em;
+}
+.sc__char {
+  display: inline-block;
+}
+.sc__space {
+  display: inline-block;
+  width: 0.26em;
+}
+
+/* ---------- Section pill ---------- */
+.section-pill-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(14px, 1.6vw, 22px);
+}
+.section-pill-wrap .pf {
+  --pf-radius: 999px;
+  --pf-ink: #111;
+}
+.section-pill-wrap--dark .pf {
+  --pf-ink: #fff;
+}
+.section-pill {
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px 8px 14px;
+  border-radius: 999px;
+  font: 500 clamp(12px, 0.98vw, 14px) / 1 var(--f-sans);
+  white-space: nowrap;
+}
+.section-pill--light {
+  background: #fff;
+  color: #111;
+  border: 1px solid rgba(17, 17, 17, 0.2);
+}
+.section-pill--dark {
+  background: var(--c-night);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+.section-pill__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ---------- Section heading ---------- */
+.section-heading {
+  text-align: center;
+  font: 400 clamp(32px, 4.15vw, 60px) / 1.2 var(--f-sans);
+  letter-spacing: -0.025em;
+}
+.section-heading--light {
+  color: var(--c-ink);
+}
+.section-heading--dark {
+  color: #fff;
+}
+.sh__word {
+  display: inline-block;
+}
+.section-heading .hw {
+  font-size: 0.94em;
+  letter-spacing: 0;
+}
+
+/* ---------- Picture coin ---------- */
+.coin {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  transform-origin: 50% 50%;
+}
+.coin__stage {
+  width: 100%;
+  height: 100%;
+  perspective: 1400px;
+}
+.coin__spin,
+.coin__body {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+.coin__edge {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: #17161b;
+  transform: translateZ(var(--z));
+}
+.coin__face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 50%;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.coin__face img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  user-select: none;
+}
+.coin__face--front {
+  transform: translateZ(3px);
+}
+.coin__face--back {
+  transform: rotateX(180deg) translateZ(3px);
+}
+.coin--ring .coin__face {
+  padding: 3px;
+  background: var(--g-ring);
+}
