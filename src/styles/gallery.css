@@ -12,6 +12,17 @@
   overflow: hidden;
   outline: none;
 }
+/* Clip only sideways: cards riding the wave can rise/dip without being cut off,
+   and keyboard focus can't scroll the row out from under the scrub. */
+@supports (overflow: clip) {
+  .hpg {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+}
+.hpg__item > * {
+  will-change: transform;
+}
 .hpg__track {
   display: flex;
   gap: clamp(16px, 2.1vw, 30px);
@@ -27,6 +38,7 @@
 /* reduced motion: a plain swipeable row */
 .hpg--native {
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
@@ -81,7 +93,7 @@
 .hpg__parallax {
   display: block;
   width: 112%;
-  transition: transform 0.6s var(--ease-out);
+  /* no CSS transition here: GSAP scrubs this transform every frame */
 }
 .hpg__parallax > img,
 .hpg__parallax > svg {

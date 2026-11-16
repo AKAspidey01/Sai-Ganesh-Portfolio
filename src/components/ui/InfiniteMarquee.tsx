@@ -1,6 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react';
 import { gsap, ScrollTrigger } from '../../lib/gsap';
 import { useMotion } from '../../hooks/useMotion';
+import { createElasticWave } from '../../lib/elastic';
 
 interface InfiniteMarqueeProps<T> {
   items: T[];
@@ -11,25 +12,13 @@ interface InfiniteMarqueeProps<T> {
   speed?: number;
 }
 
-/** Per-tile damped spring: under-damped on purpose so tiles wobble like rubber. */
-interface Spring {
-  k: number; // stiffness
-  d: number; // damping
-  skew: number;
-  skewV: number;
-  stretch: number;
-  stretchV: number;
-}
-
 /**
  * Elastic, wavy, endless marquee.
  *
- *  - One gsap.ticker loop owns everything, so the row, wave and rubber stay in sync.
- *  - The row cruises slowly; each tile rides a travelling sine wave
- *    (lifts, dips and leans with the wave's slope).
- *  - Page scroll and drag/swipe push the row. Its velocity then eases back
- *    to cruising, while per-tile springs make the tiles lean, stretch and wobble
- *    like rubber before settling.
+ *  - One gsap.ticker loop drives the row; the shared elastic wave
+ *    (lib/elastic) makes tiles ride a sine wave and wobble like rubber.
+ *  - The row cruises slowly. Page scroll and drag/swipe push it, then its
+ *    velocity eases back to cruising.
  *  - Two identical groups + modulo wrap → seamless loop with no jump.
  *  - Reduced motion: a static, wrapped grid.
  */
@@ -55,38 +44,34 @@ export function InfiniteMarquee<T>({ items, getKey, renderItem, label, speed = 3
       const cells = Array.from(track.querySelectorAll<HTMLElement>('.marquee__item'));
       if (!group || !cells.length) return;
 
-      const cfg = env.desktop
-        ? { speed, amp: 16, tilt: 0.6, maxSkew: 10, waveSpeed: 0.9 }
-        : { speed: speed * 0.7, amp: 10, tilt: 0.45, maxSkew: 6, waveSpeed: 0.8 };
+      const cruiseSpeed = env.desktop ? speed : speed * 0.7;
+      const wave = createElasticWave(
+        cells,
+        env.desktop
+          ? { ampRest: 16, ampMotion: 25.6, tilt: 0.6, waveSpeed: 0.9, maxSkew: 10, skewPerPx: 0.012, stretch: 0.07, energyAt: 600 }
+          : { ampRest: 10, ampMotion: 16, tilt: 0.45, waveSpeed: 0.8, maxSkew: 6, skewPerPx: 0.012, stretch: 0.07, energyAt: 600 },
+      );
       const { clamp, wrap } = gsap.utils;
 
       /* ---------- layout (re-measured on every ScrollTrigger refresh) ---------- */
       let period = 1; // width of one group, including its trailing gap
-      let centers: number[] = [];
-      let waveK = 0; // wave number (radians per px)
       const measure = () => {
         period = Math.max(1, group.offsetWidth);
-        centers = cells.map((c) => c.offsetLeft + c.offsetWidth / 2);
-        waveK = (Math.PI * 2) / Math.max(720, root.clientWidth * 0.85);
+        wave.measure(track, root.clientWidth);
       };
       measure();
       ScrollTrigger.addEventListener('refresh', measure);
       onCleanup(() => ScrollTrigger.removeEventListener('refresh', measure));
 
       /* ---------- state ---------- */
-      const state = { x: 0, v: 0, kick: 0, t: 0, dragging: false, active: false, started: false };
+      const state = { x: 0, v: 0, kick: 0, dragging: false, active: false, started: false };
       const drive = { speed: 0, wave: 0 }; // both ramp up when the section first arrives
       const toSpeed = gsap.quickTo(drive, 'speed', { duration: 1.4, ease: 'power2.inOut' });
-      const springs: Spring[] = cells.map((_, i) => {
-        const k = 130 + (i % 5) * 14; // slightly different stiffness → tiles wobble out of phase
-        return { k, d: 2 * 0.32 * Math.sqrt(k), skew: 0, skewV: 0, stretch: 0, stretchV: 0 };
-      });
 
       /* ---------- frame loop ---------- */
       const tick = (_time: number, deltaMs: number) => {
         if (!state.active || pausedRef.current) return;
         const dt = Math.min(deltaMs / 1000, 1 / 30);
-        state.t += dt;
 
         const cruise = -drive.speed; // leftwards
         state.kick *= Math.exp(-dt * 2.2);
@@ -100,30 +85,7 @@ export function InfiniteMarquee<T>({ items, getKey, renderItem, label, speed = 3
         }
         state.x = wrap(-period, 0, state.x);
         track.style.transform = `translate3d(${state.x.toFixed(2)}px,0,0)`;
-
-        // Deviation from calm cruising drives the rubber and the wave height.
-        const dev = state.v - cruise;
-        const energy = Math.min(Math.abs(dev) / 600, 1);
-        const amp = cfg.amp * drive.wave * (1 + energy * 0.6);
-        const skewTarget = clamp(-cfg.maxSkew, cfg.maxSkew, dev * 0.012);
-        const stretchTarget = energy * 0.07;
-
-        for (let i = 0; i < cells.length; i++) {
-          const s = springs[i];
-          s.skewV += (s.k * (skewTarget - s.skew) - s.d * s.skewV) * dt;
-          s.skew += s.skewV * dt;
-          s.stretchV += (s.k * (stretchTarget - s.stretch) - s.d * s.stretchV) * dt;
-          s.stretch += s.stretchV * dt;
-
-          const phase = (centers[i] + state.x) * waveK - state.t * cfg.waveSpeed;
-          const y = Math.sin(phase) * amp;
-          const lean = Math.atan(Math.cos(phase) * amp * waveK) * (180 / Math.PI) * cfg.tilt;
-          const sx = 1 + s.stretch;
-          const sy = 1 - s.stretch * 0.5;
-          cells[i].style.transform =
-            `translate3d(0,${y.toFixed(2)}px,0) rotate(${lean.toFixed(3)}deg) ` +
-            `skewX(${s.skew.toFixed(3)}deg) scale(${sx.toFixed(4)},${sy.toFixed(4)})`;
-        }
+        wave.step(dt, state.x, state.v - cruise, drive.wave);
       };
       gsap.ticker.add(tick);
 
@@ -155,7 +117,7 @@ export function InfiniteMarquee<T>({ items, getKey, renderItem, label, speed = 3
           state.started = true;
           intro.play();
           gsap.to(drive, { wave: 1, duration: 2.2, ease: 'power2.inOut' });
-          toSpeed(cfg.speed);
+          toSpeed(cruiseSpeed);
         },
       });
 
@@ -192,8 +154,8 @@ export function InfiniteMarquee<T>({ items, getKey, renderItem, label, speed = 3
       root.addEventListener('pointercancel', onUp);
 
       // Desktop: hovering slows the cruise right down so tools can be read.
-      const slow = () => state.started && toSpeed(cfg.speed * 0.3);
-      const resume = () => state.started && toSpeed(cfg.speed);
+      const slow = () => state.started && toSpeed(cruiseSpeed * 0.3);
+      const resume = () => state.started && toSpeed(cruiseSpeed);
       if (env.desktop) {
         root.addEventListener('pointerenter', slow);
         root.addEventListener('pointerleave', resume);
@@ -209,7 +171,7 @@ export function InfiniteMarquee<T>({ items, getKey, renderItem, label, speed = 3
         root.removeEventListener('pointerleave', resume);
         root.classList.remove('is-dragging');
         track.style.transform = '';
-        cells.forEach((c) => (c.style.transform = ''));
+        wave.reset();
       });
     },
     [items.length],
