@@ -1,14 +1,24 @@
 .marquee {
+  /* vertical room so tiles riding the wave never get clipped */
+  --wave-room: clamp(26px, 3.6vw, 48px);
   position: relative;
-  margin-top: clamp(36px, 4.2vw, 60px);
+  margin-top: clamp(12px, 1.4vw, 20px);
   overflow: hidden;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  cursor: grab;
+  touch-action: pan-y; /* horizontal swipes drive the marquee, vertical ones scroll the page */
+  user-select: none;
+  -webkit-user-select: none;
+}
+.marquee.is-dragging {
+  cursor: grabbing;
 }
 .marquee__track {
   display: flex;
   width: max-content;
-  padding-block: 6px;
+  padding-block: var(--wave-room);
+  will-change: transform;
 }
 .marquee__group {
   --gap: clamp(14px, 1.6vw, 24px);
@@ -20,6 +30,11 @@
 }
 .marquee__item {
   flex: none;
+  will-change: transform;
+  transform-origin: 50% 50%;
+}
+.marquee__item img {
+  pointer-events: none; /* stop native image drag from hijacking the swipe */
 }
 .marquee__toggle {
   position: absolute;
@@ -42,9 +57,15 @@
   -webkit-mask-image: none;
   mask-image: none;
 }
+.marquee--static {
+  cursor: auto;
+  touch-action: auto;
+}
 .marquee--static .marquee__track {
   width: auto;
   justify-content: center;
+  padding-block: 6px;
+  will-change: auto;
 }
 .marquee--static .marquee__group {
   flex-wrap: wrap;
@@ -92,7 +113,7 @@
   grid-template-columns: 1fr 1fr;
   column-gap: clamp(16px, 1.6vw, 24px);
   row-gap: clamp(28px, 3.4vw, 48px);
-  margin: clamp(40px, 4.4vw, 60px) 0 0;
+  margin: clamp(20px, 2.4vw, 32px) 0 0;
   padding: 0;
   list-style: none;
 }
