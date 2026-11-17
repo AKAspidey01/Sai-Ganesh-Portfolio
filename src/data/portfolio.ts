@@ -146,7 +146,7 @@ export const reviews: Review[] = [
   {
     id: 'daniel',
     name: 'Daniel Weber',
-    location: 'Oman , Dubai',
+    location: 'Dubai , UAE',
     rating: 5,
     quote:
       'From strategy to launch, everything was handled with clarity and professionalism. The team ensured we were aligned at every step.',

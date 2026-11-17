@@ -1,15 +1,15 @@
 /* Google fonts (Plus Jakarta Sans, Manrope, Anton, Pacifico) load from index.html.
-   Beatrice Headline Trial is commercial — place the files in /public/fonts. */
+   Beatrice Headline Trial (Displaay, trial licence) is self-hosted from /public/fonts. */
 @font-face {
   font-family: 'Beatrice Headline Trial';
-  src: url('/fonts/BeatriceHeadlineTrial-Light.woff2') format('woff2');
+  src: url('/fonts/BeatriceHeadlineTrial-Light.otf') format('opentype');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: 'Beatrice Headline Trial';
-  src: url('/fonts/BeatriceHeadlineTrial-Regular.woff2') format('woff2');
+  src: url('/fonts/BeatriceHeadlineTrial-Regular.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
   font-display: swap;

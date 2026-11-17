@@ -12,9 +12,8 @@ npm run build    # type-check + production build → dist/
 
 | What | Where |
 | --- | --- |
-| Beatrice Headline Trial font files (licensed, not included) | `public/fonts/` — see README there |
+| Beatrice Headline web licence (trial files are included now) | `public/fonts/` — see README there |
 | Official tool logos (Figma, React, VS Code, Framer…) | `public/icons/`, then set `logo` in `src/data/portfolio.ts` |
-| CV PDF | `public/Sai-Ganesh-CV.pdf` |
 | Real project covers, links, extra reviews (`// placeholder` items) | `src/data/portfolio.ts` |
 | Social URLs | `src/data/portfolio.ts` → `socials` |
 | Form backend (currently opens the visitor's mail app) | `src/components/ui/ContactForm.tsx` → `handleSubmit` |
