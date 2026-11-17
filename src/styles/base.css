@@ -30,6 +30,14 @@ html.is-locked,
 html.is-locked body {
   overflow: hidden;
 }
+/* Fill the space the hidden scrollbar leaves (--sbw is measured in Header.tsx),
+   so nothing jumps sideways when the menu opens. */
+html.is-locked {
+  padding-right: var(--sbw, 0px);
+}
+html.is-locked .header {
+  right: var(--sbw, 0px);
+}
 
 img,
 svg {

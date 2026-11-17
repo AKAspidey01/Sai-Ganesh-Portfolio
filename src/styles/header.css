@@ -16,6 +16,8 @@
 .header__pill-wrap {
   --pf-radius: 999px;
   --pf-ink: rgba(255, 255, 255, 0.9);
+  position: relative;
+  z-index: 1; /* stay above the side lines while the intro zoom overlaps them */
   flex: none;
 }
 .header__pill {
@@ -67,18 +69,36 @@
     linear-gradient(110deg, #f0626a, #8a7be6 55%, #3b8bff) border-box;
 }
 
-/* menu overlay */
+/* ---------- menu overlay ---------- */
 .menu {
+  --menu-ease: cubic-bezier(0.76, 0, 0.24, 1);
   position: fixed;
   inset: 0;
   z-index: 90;
   display: grid;
   place-items: center;
-  background: rgba(9, 8, 13, 0.97);
   color: #fff;
+}
+/* curtain layers (GSAP scales them in from the top) */
+.menu__bg {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+}
+.menu__bg--accent {
+  background: var(--g-ring);
+}
+.menu__bg--main {
+  background: var(--c-night);
+}
+.menu__nav {
+  position: relative;
+  z-index: 1;
 }
 .menu__close {
   position: absolute;
+  z-index: 2;
   top: calc(env(safe-area-inset-top, 0px) + 20px);
   right: 20px;
   display: grid;
@@ -89,7 +109,21 @@
   border: 1px solid rgba(255, 255, 255, 0.25);
   background: none;
   cursor: pointer;
+  transition: border-color 0.4s, background-color 0.4s;
 }
+.menu__close svg {
+  transition: transform 0.6s var(--menu-ease);
+}
+.menu__close:hover,
+.menu__close:focus-visible {
+  border-color: rgba(255, 255, 255, 0.6);
+  background-color: rgba(255, 255, 255, 0.06);
+}
+.menu__close:hover svg,
+.menu__close:focus-visible svg {
+  transform: rotate(90deg);
+}
+
 .menu__list {
   list-style: none;
   margin: 0;
@@ -97,19 +131,93 @@
   text-align: center;
 }
 .menu__item {
-  overflow: hidden;
+  overflow: hidden; /* mask for the entrance rise */
+  padding-inline: 3rem; /* room for the index number */
 }
 .menu__link {
+  position: relative;
   display: inline-block;
-  padding: 0.06em 0.2em;
-  font: 400 clamp(40px, 7vw, 92px) / 1.15 var(--f-brand);
+  padding: 0.04em 0.2em;
+  font: 400 clamp(40px, 7vw, 92px) / 1.12 var(--f-brand);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: color 0.25s;
+  transition: opacity 0.5s var(--ease-out);
 }
-.menu__link:hover {
+.menu__num {
+  position: absolute;
+  right: 100%;
+  top: 0.5em;
+  margin-right: 0.15em;
+  font: 500 clamp(11px, 0.9vw, 14px) / 1 var(--f-sans);
+  letter-spacing: 0.08em;
+  opacity: 0.45;
+  transition:
+    opacity 0.5s var(--ease-out),
+    color 0.5s var(--ease-out),
+    transform 0.6s var(--menu-ease);
+}
+
+/* hover / focus: letters roll up, the rose copy rolls in behind them */
+.menu__roll {
+  position: relative;
+  display: block;
+  overflow: hidden;
+}
+.menu__line {
+  display: flex;
+  justify-content: center;
+}
+.menu__line--bottom {
+  position: absolute;
+  inset: 0;
   color: var(--c-rose);
+}
+.menu__char {
+  display: inline-block;
+  transition: transform 0.7s var(--menu-ease);
+  transition-delay: calc(var(--i) * 22ms);
+}
+.menu__line--bottom .menu__char {
+  transform: translateY(110%);
+}
+.menu__link:focus-visible .menu__line--top .menu__char {
+  transform: translateY(-110%);
+}
+.menu__link:focus-visible .menu__line--bottom .menu__char {
+  transform: translateY(0);
+}
+.menu__link:focus-visible .menu__num {
+  opacity: 1;
+  color: var(--c-rose);
+  transform: translateY(-0.2em);
+}
+@media (hover: hover) {
+  .menu__link:hover .menu__line--top .menu__char {
+    transform: translateY(-110%);
+  }
+  .menu__link:hover .menu__line--bottom .menu__char {
+    transform: translateY(0);
+  }
+  .menu__link:hover .menu__num {
+    opacity: 1;
+    color: var(--c-rose);
+    transform: translateY(-0.2em);
+  }
+  /* spotlight: the hovered link stays bright, the rest dim */
+  .menu__list:hover .menu__link {
+    opacity: 0.3;
+  }
+  .menu__list .menu__link:hover {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu__char,
+  .menu__num,
+  .menu__close svg {
+    transition: none;
+  }
 }
 
 @media (max-width: 767.98px) {
