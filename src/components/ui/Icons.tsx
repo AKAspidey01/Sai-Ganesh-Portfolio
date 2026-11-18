@@ -69,20 +69,3 @@ export const StarIcon = (p: IconProps) => (
     />
   </svg>
 );
-
-/** Pen-nib glyph for the role badge; gradient fill keeps it on brand. */
-export const PenBadge = (p: IconProps) => (
-  <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" {...p}>
-    <defs>
-      <linearGradient id="penGrad" x1="0" y1="0" x2="1" y2="1">
-        <stop offset="0" stopColor="#8f7bff" />
-        <stop offset=".55" stopColor="#3b8bff" />
-        <stop offset="1" stopColor="#d4f53c" />
-      </linearGradient>
-    </defs>
-    <ellipse cx="24" cy="26" rx="20" ry="7" fill="none" stroke="#d4f53c" strokeWidth="1.4" opacity=".85" transform="rotate(-18 24 26)" />
-    <path d="M14 8l20 9-7 4-4 7z" fill="url(#penGrad)" />
-    <path d="M23 28l-9 12" stroke="#fff" strokeWidth="2" strokeLinecap="round" />
-    <circle cx="25.5" cy="20.5" r="2.4" fill="#09080d" />
-  </svg>
-);

@@ -59,6 +59,48 @@
   letter-spacing: 0.005em;
   white-space: nowrap;
 }
+/* Shining text: soft silver with a brand-coloured highlight sweeping across. */
+.hero__meta .orbit-item__in {
+  padding-inline: 0.12em; /* italic overhang stays inside the clipped background */
+  margin-inline: -0.12em;
+  color: transparent;
+  background: linear-gradient(
+      100deg,
+      #c4c4cc 0%,
+      #c4c4cc 38%,
+      #7fb0ff 44%,
+      #ffffff 50%,
+      #f39aa0 56%,
+      #c4c4cc 62%,
+      #c4c4cc 100%
+    )
+    0 0 / 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: meta-shine 5s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+.hero__meta--loc .orbit-item__in {
+  animation-delay: -1.6s;
+}
+.hero__meta--time .orbit-item__in {
+  animation-delay: -3.2s;
+}
+@keyframes meta-shine {
+  0% {
+    background-position: 100% 0;
+  }
+  60%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__meta .orbit-item__in {
+    animation: none;
+    color: #fff;
+    background: none;
+  }
+}
 .hero__meta--role {
   left: var(--side);
   top: 20%;
@@ -88,10 +130,16 @@
   transform-style: preserve-3d;
 }
 .badge3d__icon {
-  width: 1.7em;
-  height: 1.7em;
+  flex: none;
+  width: 2em;
+  height: 2em;
+  margin-block: -0.15em; /* keeps the badge line height unchanged */
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
   transform: translateZ(26px);
-  filter: drop-shadow(0 6px 10px rgba(59, 139, 255, 0.35));
+  /* faint rim light keeps the dark handles readable on the night background */
+  filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.35)) drop-shadow(0 6px 10px rgba(59, 139, 255, 0.35));
 }
 .badge3d__text {
   position: relative;

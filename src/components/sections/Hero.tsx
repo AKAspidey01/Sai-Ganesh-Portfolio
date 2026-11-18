@@ -6,7 +6,7 @@ import { site } from '../../data/portfolio';
 import { PictureCoin } from '../coin/PictureCoin';
 import { HandwritingText } from '../ui/HandwritingText';
 import { SplitChars } from '../ui/SplitChars';
-import { PenBadge } from '../ui/Icons';
+import uxPenIcon from '../../assets/icon-ux-pen.webp';
 import portraitBw from '../../assets/portrait-bw.webp';
 import portraitColor from '../../assets/portrait-color.webp';
 
@@ -68,12 +68,20 @@ export function Hero({ sectionRef, coinRef }: HeroProps) {
     /* ---------- 2. Orbit system ----------
        Each label travels along a circle centred on the coin and passing
        through its designed position. Only x/y change — never rotation — so
-       labels stay upright and readable like planets seen face-on. */
+       labels stay upright and readable like planets seen face-on.
+       Angle = designed angle + a gentle idle sway + a scroll-driven
+       revolution (all labels revolve the same way as the page scrolls). */
     const items = Array.from(hero.querySelectorAll<HTMLElement>('.orbit-item'));
-    const sweep = (env.desktop ? 7 : 3.5) * (Math.PI / 180);
+    const DEG = Math.PI / 180;
+    const sweep = (env.desktop ? 7 : 3.5) * DEG;
+    const revolve = (env.desktop ? 55 : 35) * DEG;
+    const scroll = { p: 0 };
     const orbits = items.map((item, i) => {
-      const geo = { r: 0, a: 0 };
+      const geo = { r: 0, a: 0, minX: -Infinity, maxX: Infinity };
       const measure = () => {
+        // Horizontal room before the label would leave the screen (8px margin).
+        geo.minX = Math.min(0, 8 - item.offsetLeft);
+        geo.maxX = Math.max(0, stage.clientWidth - 8 - (item.offsetLeft + item.offsetWidth));
         const cx = coin.offsetLeft + (coin.offsetParent as HTMLElement).offsetLeft + coin.offsetWidth / 2;
         const cy = coin.offsetTop + (coin.offsetParent as HTMLElement).offsetTop + coin.offsetHeight / 2;
         const dx = item.offsetLeft + item.offsetWidth / 2 - cx;
@@ -86,29 +94,38 @@ export function Hero({ sectionRef, coinRef }: HeroProps) {
       const setY = gsap.quickSetter(item, 'y', 'px');
       const proxy = { d: -sweep };
       const dir = i % 2 ? -1 : 1;
+      const place = () => {
+        const a = geo.a + proxy.d * dir + scroll.p * revolve;
+        setX(gsap.utils.clamp(geo.minX, geo.maxX, geo.r * (Math.cos(a) - Math.cos(geo.a))));
+        setY(geo.r * (Math.sin(a) - Math.sin(geo.a)));
+      };
       const tween = gsap.to(proxy, {
         d: sweep,
         duration: 8 + i * 1.7,
         ease: 'sine.inOut',
         yoyo: true,
         repeat: -1,
-        onUpdate: () => {
-          const a = geo.a + proxy.d * dir;
-          setX(geo.r * (Math.cos(a) - Math.cos(geo.a)));
-          setY(geo.r * (Math.sin(a) - Math.sin(geo.a)));
-        },
+        onUpdate: place,
       });
       tween.progress((i * 0.37) % 1);
-      return { measure, tween };
+      return { measure, place, tween };
     });
     const remeasure = () => orbits.forEach((o) => o.measure());
     ScrollTrigger.addEventListener('refresh', remeasure);
     onCleanup(() => ScrollTrigger.removeEventListener('refresh', remeasure));
 
-    // Pause the planets while the hero is off-screen.
+    // Scroll revolves the whole system (scrubbed, so it eases to a stop and reverses on scroll-up).
+    gsap.to(scroll, {
+      p: 1,
+      ease: 'none',
+      onUpdate: () => orbits.forEach((o) => o.place()),
+      scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: env.desktop ? 1 : 0.6 },
+    });
+
+    // Pause the idle sway while the hero is fully off-screen.
     ScrollTrigger.create({
       trigger: hero,
-      start: 'top top',
+      start: 'top bottom',
       end: 'bottom top',
       onToggle: (self) => orbits.forEach((o) => (self.isActive ? o.tween.resume() : o.tween.pause())),
     });
@@ -165,7 +182,7 @@ export function Hero({ sectionRef, coinRef }: HeroProps) {
         <div className="orbit-item hero__badge">
           <span className="orbit-item__in">
             <span className="badge3d">
-              <PenBadge className="badge3d__icon" />
+              <img className="badge3d__icon" src={uxPenIcon} alt="" width={160} height={160} decoding="async" />
               <span className="badge3d__text" data-text={site.roleBadge}>
                 {site.roleBadge}
               </span>
