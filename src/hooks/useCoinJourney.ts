@@ -5,8 +5,8 @@ import { useMotion } from './useMotion';
 
 /**
  * Hero → About coin transition.
- * One continuous, scroll-scrubbed physical move: the coin flips on rotateX
- * (B&W face → colour face), travels down and lands centred in the About
+ * One continuous, scroll-scrubbed physical move: the coin flips left ↔ right
+ * (rotateY; B&W face → colour face), travels down and lands centred in the About
  * slot. Scroll position *is* the progress, so stopping, slowing or scrolling
  * back all behave naturally.
  *
@@ -42,11 +42,12 @@ export function useCoinJourney(
       },
     });
 
-    tl.to(coin, { x: dx, y: dy, scale, duration: 1, ease: 'power1.inOut' }, 0)
-      .to(body, { rotateX: 180, duration: 1, ease: 'power2.inOut' }, 0)
-      // A little sideways tilt in the middle sells it as a physical object.
-      .to(body, { rotateY: env.desktop ? 14 : 6, duration: 0.5, ease: 'sine.inOut' }, 0)
-      .to(body, { rotateY: 0, duration: 0.5, ease: 'sine.inOut' }, 0.5);
+    // Left ↔ right flip around the vertical axis (CSS rotateY), B&W → colour.
+    tl.to(coin, { x: dx, y: dy, scale, duration: 1, ease: 'power1.inOut' }, 0).to(
+      body,
+      { rotateY: 180, duration: 1, ease: 'sine.inOut' },
+      0,
+    );
 
     if (env.desktop) {
       // Lift toward the viewer mid-flight, then settle.

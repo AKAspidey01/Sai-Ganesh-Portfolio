@@ -19,12 +19,12 @@ export function Footer() {
     canHover.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   }, []);
 
-  // Face selection (hover on desktop, tap/keyboard everywhere): rotateX flip.
+  // Face selection (hover on desktop, tap/keyboard everywhere): left ↔ right flip.
   useEffect(() => {
     const body = coinRef.current?.querySelector('.coin__body');
     if (!body) return;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    gsap.to(body, { rotateX: showColor ? 180 : 0, duration: reduce ? 0 : 0.9, ease: 'power3.inOut', overwrite: 'auto' });
+    gsap.to(body, { rotateY: showColor ? 180 : 0, duration: reduce ? 0 : 0.9, ease: 'power3.inOut', overwrite: 'auto' });
   }, [showColor]);
 
   useMotion(ref, (env) => {
@@ -32,17 +32,15 @@ export function Footer() {
     const coin = coinRef.current;
     if (env.reduce || !root || !coin) return;
 
-    // Entrance: horizontal flip that settles on the black & white face.
+    // Entrance: 1.5 left ↔ right turns (both faces show), settling on the black & white face.
     const spin = coin.querySelector('.coin__spin');
-    const back = coin.querySelector('.coin__face--back');
     const cv = root.querySelector('.footer__cv');
     const intro = gsap.timeline({ scrollTrigger: { trigger: root, start: 'top 80%', toggleActions: 'play none none reverse' } });
     intro
-      .set(back, { autoAlpha: 0 })
       .fromTo(spin, { rotateY: -540, scale: 0.6, autoAlpha: 0 }, { rotateY: 0, scale: 1, autoAlpha: 1, duration: env.desktop ? 1.6 : 1.1, ease: 'power3.out' })
-      .set(back, { autoAlpha: 1 })
       // CV pill slides out from behind the coin, as if tucked under it.
-      .fromTo(cv, { xPercent: -100 }, { xPercent: 0, duration: 0.9, ease: 'power4.out' }, '-=0.45');
+      // -102%: keeps the pill's border fully clipped while the coin is edge-on.
+      .fromTo(cv, { xPercent: -102 }, { xPercent: 0, duration: 0.9, ease: 'power4.out' }, '-=0.45');
 
     // Bottom band rises from below; copyright then slides in from the left.
     const bottom = root.querySelector('.footer__bottom');

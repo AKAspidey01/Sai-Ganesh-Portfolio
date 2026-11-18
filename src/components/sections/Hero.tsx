@@ -52,8 +52,8 @@ export function Hero({ sectionRef, coinRef }: HeroProps) {
       .fromTo(rings, { scale: 0.82, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 1.6, ease: 'expo.out', stagger: 0.12 }, 0)
       .fromTo(
         spin,
-        { rotateX: env.desktop ? -120 : -80, y: env.desktop ? -70 : -30, scale: 0.6, autoAlpha: 0 },
-        { rotateX: 0, y: 0, scale: 1, autoAlpha: 1, duration: env.desktop ? 1.9 : 1.4, ease: 'back.out(1.25)' },
+        { rotateY: env.desktop ? -120 : -80, y: env.desktop ? -70 : -30, scale: 0.6, autoAlpha: 0 },
+        { rotateY: 0, y: 0, scale: 1, autoAlpha: 1, duration: env.desktop ? 1.9 : 1.4, ease: 'back.out(1.25)' },
         0.15,
       )
       .add(handwriting(hello!), 0.95)

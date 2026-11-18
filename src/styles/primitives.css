@@ -158,6 +158,7 @@
   transform-origin: 50% 50%;
 }
 .coin__stage {
+  position: relative;
   width: 100%;
   height: 100%;
   perspective: 1400px;
@@ -196,9 +197,34 @@
   transform: translateZ(3px);
 }
 .coin__face--back {
-  transform: rotateX(180deg) translateZ(3px);
+  transform: rotateY(180deg) translateZ(3px);
 }
 .coin--ring .coin__face {
   padding: 3px;
   background: var(--g-ring);
+}
+
+/* three.js coin (coin3d.ts). The canvas is 130% of the coin box so tilted
+   edges never clip; once it draws, the CSS coin underneath becomes an
+   invisible rig that GSAP keeps animating and the 3D coin copies. */
+.coin__gl {
+  position: absolute;
+  inset: -15%;
+  pointer-events: none;
+  opacity: 0;
+}
+.coin__gl canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.coin.is-3d .coin__gl {
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+.coin.is-3d .coin__spin {
+  /* !important beats GSAP's inline autoAlpha; opacity (not visibility) keeps
+     the portrait's alt text available to screen readers. */
+  opacity: 0 !important;
+  transition: opacity 0.35s ease;
 }
