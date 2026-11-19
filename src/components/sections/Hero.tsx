@@ -66,22 +66,30 @@ export function Hero({ sectionRef, coinRef }: HeroProps) {
       );
 
     /* ---------- 2. Orbit system ----------
-       Each label travels along a circle centred on the coin and passing
-       through its designed position. Only x/y change — never rotation — so
-       labels stay upright and readable like planets seen face-on.
-       Angle = designed angle + a gentle idle sway + a scroll-driven
-       revolution (all labels revolve the same way as the page scrolls). */
+       Each label is a planet on a circle centred on the coin, passing through
+       its designed position. Only x/y change (never rotation), so the text
+       stays upright and readable.
+       - Idle: each label loops round a small ellipse lying along its orbit
+         (a swing along the orbit plus a little in/out), so it never comes to
+         a dead stop the way a back-and-forth sway does.
+       - Scroll: the whole system revolves the same way (scrubbed, so it eases
+         to a stop and reverses on scroll-up).
+       Everything is placed from ONE ticker callback per frame, and the labels
+       are GPU layers (hero.css), so sub-pixel motion stays smooth. */
     const items = Array.from(hero.querySelectorAll<HTMLElement>('.orbit-item'));
     const DEG = Math.PI / 180;
-    const sweep = (env.desktop ? 7 : 3.5) * DEG;
+    const swing = (env.desktop ? 6 : 3) * DEG; // along the orbit
+    const bob = env.desktop ? 10 : 5; // px, in / out
     const revolve = (env.desktop ? 55 : 35) * DEG;
     const scroll = { p: 0 };
+    // Near a screen edge the motion eases off (tanh) instead of hitting a hard stop.
+    const soft = (x: number, lo: number, hi: number) => (x < 0 ? lo * Math.tanh(x / Math.min(lo, -1e-6)) : hi * Math.tanh(x / Math.max(hi, 1e-6)));
     const orbits = items.map((item, i) => {
-      const geo = { r: 0, a: 0, minX: -Infinity, maxX: Infinity };
+      const geo = { r: 0, a: 0, lo: 0, hi: 0 };
       const measure = () => {
         // Horizontal room before the label would leave the screen (8px margin).
-        geo.minX = Math.min(0, 8 - item.offsetLeft);
-        geo.maxX = Math.max(0, stage.clientWidth - 8 - (item.offsetLeft + item.offsetWidth));
+        geo.lo = Math.min(0, 8 - item.offsetLeft);
+        geo.hi = Math.max(0, stage.clientWidth - 8 - (item.offsetLeft + item.offsetWidth));
         const cx = coin.offsetLeft + (coin.offsetParent as HTMLElement).offsetLeft + coin.offsetWidth / 2;
         const cy = coin.offsetTop + (coin.offsetParent as HTMLElement).offsetTop + coin.offsetHeight / 2;
         const dx = item.offsetLeft + item.offsetWidth / 2 - cx;
@@ -90,44 +98,57 @@ export function Hero({ sectionRef, coinRef }: HeroProps) {
         geo.a = Math.atan2(dy, dx);
       };
       measure();
-      const setX = gsap.quickSetter(item, 'x', 'px');
-      const setY = gsap.quickSetter(item, 'y', 'px');
-      const proxy = { d: -sweep };
-      const dir = i % 2 ? -1 : 1;
-      const place = () => {
-        const a = geo.a + proxy.d * dir + scroll.p * revolve;
-        setX(gsap.utils.clamp(geo.minX, geo.maxX, geo.r * (Math.cos(a) - Math.cos(geo.a))));
-        setY(geo.r * (Math.sin(a) - Math.sin(geo.a)));
+      return {
+        geo,
+        measure,
+        setX: gsap.quickSetter(item, 'x', 'px'),
+        setY: gsap.quickSetter(item, 'y', 'px'),
+        period: 9 + i * 1.9, // seconds per idle loop
+        phase: i * 2.1,
+        dir: i % 2 ? -1 : 1,
       };
-      const tween = gsap.to(proxy, {
-        d: sweep,
-        duration: 8 + i * 1.7,
-        ease: 'sine.inOut',
-        yoyo: true,
-        repeat: -1,
-        onUpdate: place,
-      });
-      tween.progress((i * 0.37) % 1);
-      return { measure, place, tween };
     });
-    const remeasure = () => orbits.forEach((o) => o.measure());
+
+    let idle = 0; // seconds of idle drift; only advances while the hero is on screen
+    let onScreen = true;
+    const place = () => {
+      for (const o of orbits) {
+        const t = (idle / o.period) * Math.PI * 2 + o.phase;
+        const a = o.geo.a + scroll.p * revolve + Math.sin(t) * swing * o.dir;
+        const r = o.geo.r + Math.cos(t) * bob;
+        o.setX(soft(r * Math.cos(a) - o.geo.r * Math.cos(o.geo.a), o.geo.lo, o.geo.hi));
+        o.setY(r * Math.sin(a) - o.geo.r * Math.sin(o.geo.a));
+      }
+    };
+    const tick = (_time: number, deltaMs: number) => {
+      if (!onScreen) return;
+      idle += Math.min(deltaMs, 100) / 1000; // no leap after a stalled frame / background tab
+      place();
+    };
+    gsap.ticker.add(tick);
+    onCleanup(() => gsap.ticker.remove(tick));
+    place();
+
+    const remeasure = () => {
+      orbits.forEach((o) => o.measure());
+      place();
+    };
     ScrollTrigger.addEventListener('refresh', remeasure);
     onCleanup(() => ScrollTrigger.removeEventListener('refresh', remeasure));
 
-    // Scroll revolves the whole system (scrubbed, so it eases to a stop and reverses on scroll-up).
+    // Scroll revolves the whole system; the ticker above applies it.
     gsap.to(scroll, {
       p: 1,
       ease: 'none',
-      onUpdate: () => orbits.forEach((o) => o.place()),
       scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: env.desktop ? 1 : 0.6 },
     });
 
-    // Pause the idle sway while the hero is fully off-screen.
+    // Stop all orbit work while the hero is fully off-screen.
     ScrollTrigger.create({
       trigger: hero,
       start: 'top bottom',
       end: 'bottom top',
-      onToggle: (self) => orbits.forEach((o) => (self.isActive ? o.tween.resume() : o.tween.pause())),
+      onToggle: (self) => (onScreen = self.isActive),
     });
 
     /* ---------- 3. Dimensional role badge ---------- */

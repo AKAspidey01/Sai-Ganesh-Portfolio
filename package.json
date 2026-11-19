@@ -10,6 +10,7 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@emailjs/browser": "^5.0.3",
     "@gsap/react": "^2.1.2",
     "gsap": "^3.13.0",
     "react": "^18.3.1",

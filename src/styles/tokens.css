@@ -36,4 +36,12 @@
   --gutter-min: clamp(20px, 5vw, 48px);
   --section-pad: clamp(72px, 8.4vw, 124px);
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* screen height unit: small-viewport height where supported (stable on mobile toolbars) */
+  --vh: 1vh;
+}
+@supports (height: 1svh) {
+  :root {
+    --vh: 1svh;
+  }
 }

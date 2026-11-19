@@ -30,7 +30,9 @@ export function RollingText({ text, className = '', start = 'top 92%', end = 'to
         rotateX: 0,
         ease: 'power2.out',
         stagger: 0.07,
-        scrollTrigger: { trigger: el, start, end, scrub: scrubFor(env, 1, 0.6) },
+        // clamp(): on tall screens the page can't scroll far enough to reach the
+        // end point (e.g. the footer), so cap it at the max scroll to always finish.
+        scrollTrigger: { trigger: el, start: `clamp(${start})`, end: `clamp(${end})`, scrub: scrubFor(env, 1, 0.6) },
       },
     );
   });

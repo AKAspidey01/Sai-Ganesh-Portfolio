@@ -1,11 +1,24 @@
+/* The hero is exactly one screen tall and everything in it is sized by the
+   tighter of width and height, so the header, labels, coin, "Hello" and the
+   name always fit on screen (laptops lose ~120px of height to browser chrome).
+   The name sits on the bottom edge with the foot of the letters running into
+   the next section, as designed.
+   Vertical budget: header reserve (--top) · coin area · title (--title-h).
+   The coin is centred in the space between header and title. */
 .hero {
-  --coin: clamp(184px, 20.8vw, 300px);
-  --coin-y: 42%;
+  --top: clamp(84px, calc(var(--vh) * 12), 120px);
+  --name-size: clamp(56px, min(18.5vw, calc(var(--vh) * 24)), 300px);
+  --hello-size: clamp(26px, min(4.9vw, calc(var(--vh) * 7)), 84px);
+  --coin: clamp(120px, min(36vw, calc(var(--vh) * 30)), 300px);
+  /* Hello line (1.25) + visible part of the name (0.785, minus the 0.02 overlap) */
+  --title-h: calc(var(--hello-size) * 1.25 + var(--name-size) * 0.765);
+  --coin-y: calc(var(--top) + (100% - var(--top) - var(--title-h)) / 2);
   --side: clamp(20px, 10.4vw, 150px);
-  --name-size: clamp(76px, 16.8vw, 260px);
   position: relative;
   z-index: 3;
-  height: clamp(600px, 100svh, 1080px);
+  height: 100vh;
+  height: calc(var(--vh) * 100);
+  min-height: 360px;
   background: var(--c-night);
   color: #fff;
 }
@@ -50,6 +63,9 @@
   position: absolute;
   margin: 0;
   z-index: 4;
+  /* Own GPU layer: moved every frame, so no repaint per frame and smooth
+     sub-pixel motion (unlayered text snaps to whole pixels and stutters). */
+  will-change: transform;
 }
 .orbit-item__in {
   display: inline-block;
@@ -101,18 +117,21 @@
     background: none;
   }
 }
+/* Labels sit relative to the coin, so they follow it on every screen shape:
+   role/location halfway between the header and the coin's top edge, time
+   beside the lower part of the coin. */
 .hero__meta--role {
   left: var(--side);
-  top: 20%;
+  top: calc((var(--top) + var(--coin-y) - var(--coin) / 2) / 2 - 0.6em);
   font-style: italic;
 }
 .hero__meta--loc {
   right: var(--side);
-  top: 20%;
+  top: calc((var(--top) + var(--coin-y) - var(--coin) / 2) / 2 - 0.6em);
 }
 .hero__meta--time {
   left: var(--side);
-  top: 62%;
+  top: calc(var(--coin-y) + var(--coin) * 0.42);
   font-weight: 400;
 }
 
@@ -120,7 +139,7 @@
 .hero__badge {
   left: calc(50% + var(--coin) / 2 + clamp(16px, 2.4vw, 36px));
   top: calc(var(--coin-y) - 1.4em);
-  font-size: clamp(16px, 2vw, 30px);
+  font-size: clamp(15px, min(2vw, calc(var(--vh) * 3.8)), 30px);
   perspective: 700px;
 }
 .badge3d {
@@ -183,16 +202,19 @@
   font-weight: 400;
 }
 .hero__hello {
-  font-size: clamp(36px, 4.9vw, 74px);
+  font-size: var(--hello-size);
   line-height: 1.25;
-  margin-bottom: calc(var(--name-size) * -0.08);
+  margin-bottom: calc(var(--name-size) * -0.02);
   position: relative;
   z-index: 2;
 }
+/* Line height 0.95 puts Anton's cap tops at ~0.03em (baseline ~0.90em). The
+   mask stops at 0.785em, hiding the foot of the letters (~13% of the cap
+   height) so the name runs into the next section. */
 .hero__name-mask {
   display: block;
   width: 100%;
-  height: calc(var(--name-size) * 0.86);
+  height: calc(var(--name-size) * 0.785);
   overflow: hidden;
   text-align: center;
 }
@@ -200,7 +222,7 @@
   display: inline-block;
   font-family: var(--f-brand);
   font-size: var(--name-size);
-  line-height: 1.1;
+  line-height: 0.95;
   letter-spacing: 0.035em;
   color: #fff;
 }
@@ -209,23 +231,14 @@
   margin-block: 0;
 }
 
-@media (max-width: 1023.98px) {
-  .hero {
-    --coin-y: 40%;
-  }
-}
-
 @media (max-width: 767.98px) {
   .hero {
-    --coin: clamp(168px, 50vw, 220px);
-    --coin-y: 41%;
+    --top: 80px;
+    --coin: clamp(140px, min(50vw, calc(var(--vh) * 28)), 220px);
     --side: 20px;
-    --name-size: clamp(64px, 21vw, 150px);
-    height: clamp(600px, 100svh, 900px);
-  }
-  .hero__meta--role,
-  .hero__meta--loc {
-    top: 15%;
+    --name-size: clamp(52px, min(21vw, calc(var(--vh) * 16)), 150px);
+    --hello-size: clamp(28px, min(9.2vw, calc(var(--vh) * 5)), 40px);
+    min-height: 520px;
   }
   .hero__meta--time {
     top: calc(var(--coin-y) + var(--coin) / 2 + 22px);

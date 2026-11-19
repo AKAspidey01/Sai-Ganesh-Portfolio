@@ -67,8 +67,15 @@
 
 .kpi__value {
   font: 400 clamp(52px, 6.3vw, 92px) / 1 var(--f-kpi);
-  letter-spacing: -0.045em;
+  letter-spacing: -0.025em;
   color: #0e0e0e;
+}
+/* Each digit sits in an overflow-hidden mask for the rise-in; side padding
+   (cancelled by the negative margin) keeps round glyphs like 0/8/9 from
+   being shaved off, since their ink reaches past the tracked advance width. */
+.kpi__value .sc__mask {
+  padding-inline: 0.1em;
+  margin-inline: -0.1em;
 }
 .kpi__label {
   margin-top: 0.3em;

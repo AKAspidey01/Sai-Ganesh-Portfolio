@@ -185,8 +185,27 @@
 .contact-form__status--error {
   color: #c0303a;
 }
-.contact-form__status--ok {
-  color: #1b7f4b;
+.contact-form__status--sending {
+  color: #6b6b72;
+}
+.contact-form__submit:disabled {
+  cursor: progress;
+  background: #3a3a3e;
+}
+.contact-form__submit-icon.is-sending svg {
+  animation: cf-send 0.9s ease-in-out infinite;
+}
+@keyframes cf-send {
+  0% { transform: translate(0, 0); opacity: 1; }
+  45% { transform: translate(6px, -6px); opacity: 0; }
+  55% { transform: translate(-6px, 6px); opacity: 0; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .contact-form__submit-icon.is-sending svg { animation: none; }
+}
+.field__control:has([aria-invalid='true']) {
+  border-color: #c0303a;
 }
 
 @media (max-width: 899.98px) {

@@ -175,12 +175,24 @@ export const contact = {
   callHint: 'Tap to call or send a message',
   mailTitle: 'Want to chat me?',
   mailHint: 'Send me a mail shortly',
+  /** Phone country picker; the first entry is the default. `digits` = national number length. */
   countries: [
-    { code: 'US', placeholder: '+1 (555) 000-0000' },
-    { code: 'IN', placeholder: '+91 90000 00000' },
-    { code: 'AE', placeholder: '+971 50 000 0000' },
-    { code: 'GB', placeholder: '+44 7700 900000' },
+    { code: 'IN', dial: '+91', placeholder: '90000 00000', digits: 10 },
+    { code: 'US', dial: '+1', placeholder: '(555) 000-0000', digits: 10 },
+    { code: 'AE', dial: '+971', placeholder: '50 000 0000', digits: 9 },
+    { code: 'GB', dial: '+44', placeholder: '7700 900000', digits: 10 },
   ],
+};
+
+/** Full-screen thank-you shown after the contact form is sent. */
+export const thankYou = {
+  brand: 'A SAI GANESH',
+  title: 'THANK YOU',
+  script: 'for Contacting Me!',
+  message: 'I’ve received your message and will get in touch with you shortly.',
+  back: 'Back to Portfolio',
+  /** ms before the form resets and the page reloads */
+  duration: 8000,
 };
 
 export const socials: SocialLink[] = [
